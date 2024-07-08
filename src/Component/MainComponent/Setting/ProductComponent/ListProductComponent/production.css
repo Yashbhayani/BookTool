@@ -1,0 +1,14 @@
+.btn.btn-outline-primary,
+.btn.btn-outline-info {
+  width: 10%;
+}
+
+.btn.btn-outline-success {
+  width: 30%;
+}
+
+.btn.btn-outline-warning,
+.btn.btn-outline-danger {
+    width: 90%;
+}
+
