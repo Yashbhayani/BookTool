@@ -2,24 +2,16 @@ import React, { useContext, useEffect, useState } from 'react'
 import './home.css';
 import toast from 'react-hot-toast';
 import Homecontex from '../../../Context/Home/HomeContext';
+import { useNavigate } from 'react-router-dom';
 
 const Home = (props: any) => {
     const context = useContext(Homecontex);
     const { DashboardFunction } = context;
-    const [isLoggedIn, setIsLoggedIn] = useState(() => {
-        const token = sessionStorage.getItem("token");
-        return token !== null && token !== undefined && token !== "";
-    });
     const [TotalAverageReview, setTotalAverageReview] = useState(0);
     const [TotalBook, setTotalBook] = useState(0);
     const [TotalLike, setTotalLike] = useState(0);
     const [TotalUser, setTotalUser] = useState(0);
-
-
-    useEffect(() => {
-        const token = sessionStorage.getItem("token");
-        setIsLoggedIn(token !== null && token !== undefined && token !== "");
-    }, [isLoggedIn]);
+    const navigate = useNavigate();
 
     const CallDashboard = async () => {
         props.setLoading(true);
@@ -39,7 +31,7 @@ const Home = (props: any) => {
                         color: '#fff',
                     },
                     duration: 2000,
-                })
+                });
                 props.setLoading(false);
             }
         } catch {
@@ -50,14 +42,22 @@ const Home = (props: any) => {
                     color: '#fff',
                 },
                 duration: 2000,
-            })
+            });
             props.setLoading(false);
         }
-    }
+    };
 
     useEffect(() => {
-        CallDashboard();
-    }, [TotalAverageReview, TotalBook, TotalLike, TotalUser]);
+        props.setLoading(true);
+        const token = sessionStorage.getItem("token");
+        if (token) {
+            CallDashboard();
+        } else {
+            props.setLoading(false);
+            navigate('/login');
+        }
+    }, [navigate]);
+
 
 
     return (

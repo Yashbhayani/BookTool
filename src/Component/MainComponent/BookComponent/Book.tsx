@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import './book.css';
+import { useNavigate } from 'react-router-dom';
 
 const Book = () => {
     const [isLoggedIn, setIsLoggedIn] = useState(() => {
@@ -7,10 +8,16 @@ const Book = () => {
         return token !== null && token !== undefined && token !== "";
     });
 
+    const navigate = useNavigate();
+
     useEffect(() => {
         const token = sessionStorage.getItem("token");
-        setIsLoggedIn(token !== null && token !== undefined && token !== "");
-    }, [isLoggedIn]);
+        if (token !== null && token !== undefined && token !== "") {
+        } else {
+            navigate('/login');
+        }
+    }, []); // Empty dependency array ensures this runs only on mount
+
     return (
         <div className="body-container">
             <div className="grid-container">

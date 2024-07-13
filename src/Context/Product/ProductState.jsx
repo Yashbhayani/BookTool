@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Productcontex from "./ProductContext";
-import { producturl } from "../API/ApiRouter";
+import { producturl, categoryurl } from "../API/ApiRouter";
 
 
 const ProductState = (props) => {
@@ -23,10 +23,30 @@ const ProductState = (props) => {
         }
     };
 
+    const CategoryFunction = async (report) => {
+        try {
+            let jsonString = JSON.stringify(report);
+            let reportParam = encodeURIComponent(jsonString);
+            let urlWithParams = `${categoryurl}?report=${reportParam}`;
+            const response = await fetch(urlWithParams, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "token": sessionStorage.getItem("token")
+                }
+            });
+            const json = await response.json();
+            return json;
+        } catch (e) {
+            console.error('Error fetching data:', e);
+        }
+    };
+
     return (
         <Productcontex.Provider
             value={{
-                ProductFunction
+                ProductFunction,
+                CategoryFunction
             }}
         >
             {props.children}

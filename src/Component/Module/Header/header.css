@@ -1,6 +1,6 @@
 .logo {
   height: 50px;
-  width:200px;
+  width: 200px;
 }
 
 @media (max-width: 768px) {
@@ -14,7 +14,6 @@
 .nav {
   width: 200px; /* Adjust as needed */
 }
-
 
 /* Submenu styles */
 .submenu.collapse:not(.show) {
@@ -30,4 +29,9 @@
 .nav-link.active {
   color: #0056b3; /* Adjust text color for better readability */
   border-radius: 5px; /* Optional: Add some rounding to corners */
+}
+
+.content {
+  flex: 1; /* Take up remaining space */
+  padding: 20px;
 }

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { BrowserRouter, Route, Routes, Navigate, useNavigate, createBrowserRouter } from "react-router-dom";
+import { BrowserRouter, Route, Routes, Navigate, useNavigate, createBrowserRouter, RouterProvider, Outlet } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "react-toastify/dist/ReactToastify.css";
@@ -19,83 +19,140 @@ import Books from "./Component/MainComponent/BooksComponent/Books";
 import User from "./Component/MainComponent/UserComponent/User";
 import Users from "./Component/MainComponent/UsersComponent/Users";
 import ListProduct from "./Component/MainComponent/Setting/ProductComponent/ListProductComponent/ListProduct";
-import Category from "./Component/MainComponent/Setting/CategoryComponent/Category";
+import Category from "./Component/MainComponent/Setting/CategoryComponent/ListCategoryComponent/Category";
 import SubCategory from "./Component/MainComponent/Setting/SubCategoryComponent/SubCategory";
 import AddProduct from "./Component/MainComponent/Setting/ProductComponent/AddProductComponent/AddProduct";
+import path from "path";
 
 function App() {
-  const [loading, setLoading] = useState(false); // State to manage loading state
-
-  const LogState = useSelector((state: unknown) => (state as any).statues);
+  const [loading, setLoading] = useState(false);
+  const LogState = useSelector((state: any) => state.statues); // Assuming `state.statues` is correct
   const dispatch = useDispatch();
-  const action = bindActionCreators(actionCreators, dispatch);
+  const { Login: loginAction } = bindActionCreators(actionCreators, dispatch);
 
   useEffect(() => {
-    let token = sessionStorage.getItem("token");
-    console.log(LogState)
-    if (token) {
-      action.Login(true);
-    } else {
-      action.Login(false);
-    }
-    console.log(LogState)
+    const fetchData = async () => {
+      let token = sessionStorage.getItem("token");
+      if (token) {
+        loginAction(true); // Dispatch action to update login state
+      } else {
+        loginAction(false); // Dispatch action to update login state
+      }
+    };
+    fetchData();
   }, []);
 
+  const router = createBrowserRouter([
+    {
+      path: '/login',
+      element: LogState ? <Navigate to='/' /> : <Login setLoading={setLoading} />,
+    },
+    {
+      path: '/',
+      element: (
+        <Header setLoading={setLoading}>
+          <Home setLoading={setLoading} />
+        </Header>
+      ),
+    },
+    {
+      path: '/product',
+      element: (
+        <Header setLoading={setLoading}>
+          <ListProduct setLoading={setLoading} />
+        </Header>
+      ),
+    },
+    {
+      path: '/product/save',
+      element: (
+        <Header setLoading={setLoading}>
+          <AddProduct setLoading={setLoading} />
+        </Header>
+      ),
+    },
+    {
+      path: '/category',
+      element: (
+        <Header setLoading={setLoading}>
+          <Category setLoading={setLoading} />
+        </Header>
+      ),
+    },
+    {
+      path: '/subcategory',
+      element: (
+        <Header setLoading={setLoading}>
+          <SubCategory setLoading={setLoading} />
+        </Header>
+      ),
+    },
+    {
+      path: '/dashboard',
+      element: (
+        <Header setLoading={setLoading}>
+          <Dashboard />
+        </Header>
+      ),
+    },
+    {
+      path: '/books',
+      element: (
+        <Header setLoading={setLoading}>
+          <Books />
+        </Header>
+      ),
+    },
+    {
+      path: '/book/:id',
+      element: (
+        <Header setLoading={setLoading}>
+          <Book />
+        </Header>
+      ),
+    },
+    {
+      path: '/users',
+      element: (
+        <Header setLoading={setLoading}>
+          <Users />
+        </Header>
+      ),
+    },
+    {
+      path: '/user/:id',
+      element: (
+        <Header setLoading={setLoading}>
+          <User />
+        </Header>
+      ),
+    },
+    {
+      path: '*',
+      element: (
+        <Navigate to="/" />
+      ),
+    },
+  ]);
+
   return (
-    <BrowserRouter>
-      <div>
-        {!LogState && (
-          <Routes>
-            <Route path="/login" element={<Login setLoading={setLoading} />} />
-            {/* <Route path="*" element={<Navigate to="/login" />} /> */}
-          </Routes>
-        )}
-      </div>
-      <div>
-        {LogState && (
-          <div className="container-fluid position-fixed">
-            <div className="row flex-nowrap">
-              <div className="col-auto col-md-3 col-xl-2 px-sm-2 px-0 bg-dark">
-                <div className="d-flex flex-column align-items-center align-items-sm-start px-3 pt-2 text-white min-vh-100">
-                  <Header setLoading={setLoading} />
-                </div>
-              </div>
-              <div className="col py-3">
-                <Routes>
-                  <Route
-                    path="/"
-                    element={<Home setLoading={setLoading} />}
-                  />
-                  <Route path="/product" element={<ListProduct setLoading={setLoading} />} />
-                  <Route path="/product/save" element={<AddProduct setLoading={setLoading} />} />
-                  <Route path="/category" element={<Category setLoading={setLoading} />} />
-                  <Route path="/subcategory" element={<SubCategory setLoading={setLoading} />} />
-                  <Route path="/dashboard" element={<Dashboard />} />
-                  <Route path="/books" element={<Books />} />
-                  <Route path="/book/:id" element={<Book />} />
-                  <Route path="/users" element={<Users />} />
-                  <Route path="/user/:id" element={<User />} />
-                  <Route path="*" element={<Navigate to="/" />} />
-                </Routes>
-              </div>
+    <>
+      <RouterProvider router={router} />
+          <div className="spinner-container">
+            <div style={{ position: "fixed", top: "50%", left: "50%", transform: "translate(-50%, -50%)", zIndex: 1000 }}>
+              <BallTriangle
+                height={80}
+                width={80}
+                radius={5}
+                color="#07f2fa"
+                ariaLabel="loading"
+                visible={loading}
+              />
             </div>
           </div>
-        )}
-      </div>
-      {loading ? (
-        <div className="spinner-container">
-          <div style={{ position: "fixed", top: "50%", left: "50%", transform: "translate(-50%, -50%)", zIndex: 1000 }}>
-            <BallTriangle
-              height={80}
-              width={80}
-              color="#07f2fa"
-              ariaLabel="loading"
-            />
-          </div>
-        </div>
-      ) : null}
-      <Toaster position="top-right" reverseOrder={true} />
-    </BrowserRouter>
+          <div className="overlay" style={{ display: loading ? 'block' : 'none' }}></div>
+          <Toaster position="top-right" reverseOrder={true} />
+    </>
   );
 }
 

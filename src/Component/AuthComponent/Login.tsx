@@ -11,8 +11,8 @@ import Authcontex from "../../Context/Auth/AuthContext";
 const Login = (props: any) => {
     const context = useContext(Authcontex);
     const { LoginFunction } = context;
-    const dispath = useDispatch();
-    const action = bindActionCreators(actionCreators, dispath);
+    const dispatch = useDispatch();
+    const action = bindActionCreators(actionCreators, dispatch);
     const navigate = useNavigate();
     const [isLoggedIn, setIsLoggedIn] = useState(() => {
         const token = sessionStorage.getItem("token");
@@ -25,10 +25,6 @@ const Login = (props: any) => {
         const token = sessionStorage.getItem("token");
         setIsLoggedIn(token !== null && token !== undefined && token !== "");
     }, []);
-
-    useEffect(() => {
-    }, [isLoggedIn]);
-
 
     const onLogin = async (event: any) => {
         event.preventDefault();
@@ -49,9 +45,9 @@ const Login = (props: any) => {
                     },
                     duration: 2000,
                 });
-                props.setLoading(false);
-                action.Login(true);
-                navigate('/');
+                // Navigate after setting token and updating isLoggedIn state
+                setIsLoggedIn(true); // Update isLoggedIn state
+                action.Login(true); // Uncomment or adjust if needed
             } else {
                 toast.error(response.Message, {
                     style: {
@@ -61,7 +57,6 @@ const Login = (props: any) => {
                     },
                     duration: 2000,
                 })
-                props.setLoading(false);
             }
         } catch {
             toast.error("Server is not working", {
@@ -72,43 +67,42 @@ const Login = (props: any) => {
                 },
                 duration: 2000,
             })
+        } finally {
             props.setLoading(false);
         }
     }
 
     return (
-        <>
-            <div className="login-container">
-                <div className="login-content">
-                    <div className="login-box">
-                        <img className="logo" src={bookstoreLogo} alt="Bookstore Logo" />
-                        <div className="background-image" />
-                        <h2 className="welcome-text">Welcome Back!</h2>
-                        <form className="login-form" onSubmit={onLogin}>
-                            <div className="form-group">
-                                <input
-                                    type="email"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    placeholder="Email"
-                                    required
-                                />
-                            </div>
-                            <div className="form-group">
-                                <input
-                                    type="password"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    placeholder="Password"
-                                    required
-                                />
-                            </div>
-                            <button type="submit" className="login-button">Login</button>
-                        </form>
-                    </div>
+        <div className="login-container">
+            <div className="login-content">
+                <div className="login-box">
+                    <img className="logo" src={bookstoreLogo} alt="Bookstore Logo" />
+                    <div className="background-image" />
+                    <h2 className="welcome-text">Welcome Back!</h2>
+                    <form className="login-form" onSubmit={onLogin}>
+                        <div className="form-group">
+                            <input
+                                type="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                placeholder="Email"
+                                required
+                            />
+                        </div>
+                        <div className="form-group">
+                            <input
+                                type="password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                placeholder="Password"
+                                required
+                            />
+                        </div>
+                        <button type="submit" className="login-button">Login</button>
+                    </form>
                 </div>
             </div>
-        </>
+        </div>
     )
 }
 

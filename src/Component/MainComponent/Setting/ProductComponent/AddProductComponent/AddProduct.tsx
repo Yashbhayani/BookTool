@@ -1,16 +1,25 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import HomeContext from '../../../../../Context/Home/HomeContext';
+import { useNavigate } from 'react-router-dom';
 
 const AddProduct = (props: any) => {
     const context = useContext(HomeContext);
     const { DashboardFunction } = context;
-
+    const navigate = useNavigate();
     const [code, setCode] = useState('');
     const [name, setName] = useState('');
     const [errors, setErrors] = useState<{ [key: string]: string }>({
         code: '',
         name: '',
     });
+
+    useEffect(() => {
+        const token = sessionStorage.getItem("token");
+        if (token !== null && token !== undefined && token !== "") {
+        } else {
+            navigate('/login');
+        }
+    }, []); // Empty dependency array ensures this runs only on mount
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
