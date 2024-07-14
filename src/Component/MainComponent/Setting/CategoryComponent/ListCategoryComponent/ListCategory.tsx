@@ -5,11 +5,11 @@ import Authcontex from '../../../../../Context/Auth/AuthContext';
 import Productcontex from '../../../../../Context/Product/ProductContext';
 import { bindActionCreators } from 'redux';
 import { actionCreators } from '../../../../../Redux';
-import { ICategoryModel } from '../../../../../models/productionmodel';
+import { ICategoryModel } from '../../../../../models/model';
 import toast from 'react-hot-toast';
 import Pagination from '../../../../Module/PaginationComponent/Pagination';
 
-const Category = (props: any) => {
+const ListCategory = (props: any) => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const context = useContext(Authcontex);
@@ -84,8 +84,6 @@ const Category = (props: any) => {
                 onset_val: (cP - 1) * iP, // offset
                 offset_val: iP // limit
             };
-
-            console.log(jsonObject);
             let response = await CategoryFunction(jsonObject);
             if (response.Success) {
                 setTotalRecords(response.data.categoryCount);
@@ -218,4 +216,4 @@ const Category = (props: any) => {
     )
 }
 
-export default Category;
+export default ListCategory;

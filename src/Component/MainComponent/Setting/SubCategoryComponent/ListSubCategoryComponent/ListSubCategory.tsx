@@ -1,32 +1,26 @@
-import React, { useContext, useEffect, useState } from 'react';
-import './production.css';
-import Authcontex from '../../../../../Context/Auth/AuthContext';
-import toast from 'react-hot-toast';
-import Productcontex from '../../../../../Context/Product/ProductContext';
-import Pagination from '../../../../Module/PaginationComponent/Pagination';
-import { IProductModel } from '../../../../../models/model';
-import { bindActionCreators } from 'redux';
-import { actionCreators } from '../../../../../Redux';
+import React, { useContext, useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import Authcontex from '../../../../../Context/Auth/AuthContext';
+import Productcontex from '../../../../../Context/Product/ProductContext';
+import { ISubcategoryModel } from '../../../../../models/model';
+import { bindActionCreators } from 'redux';
+import { actionCreators } from '../../../../../Redux';
+import toast from 'react-hot-toast';
+import Pagination from '../../../../Module/PaginationComponent/Pagination';
 
-const initialProductList: IProductModel[] = [];
-const ListProduct = (props: any) => {
+const ListSubCategory = (props: any) => {
     const dispatch = useDispatch();
-    const navigate = useNavigate(); // Assuming useNavigate is imported correctly
-
+    const navigate = useNavigate();
     const context = useContext(Authcontex);
     const Productcontext = useContext(Productcontex);
     const { CheckuserFunction } = context;
-    const { ProductFunction } = Productcontext;
+    const { SubCategoryFunction } = Productcontext;
+    const [searchTerm, setSearchTerm] = useState('');
     const [sortBy, setSortBy] = useState(''); // Column to sort by
     const [sortOrder, setSortOrder] = useState(0);
-    const [Checkuser, setCheckuser] = useState(Boolean);
-    const [searchTerm, setSearchTerm] = useState('');
-
     const action = bindActionCreators(actionCreators, dispatch);
-    const [productList, setProductList] = useState<IProductModel[]>(initialProductList);
-    const [loading, setLoading] = useState(true);
+    const [subCategoryList, setSubCategoryList] = useState<ISubcategoryModel[]>([]);
 
     const [itemsPerPage, setItemsPerPage] = useState(10);
     const [currentPage, setCurrentPage] = useState(1);
@@ -35,38 +29,24 @@ const ListProduct = (props: any) => {
     useEffect(() => {
         const token = sessionStorage.getItem("token");
         if (token !== null && token !== undefined && token !== "") {
-            CallCheckuser();
+            CallCheckuser(); // Await the Checkuser function
         } else {
             navigate('/login');
-            action.Login(true);
         }
-    }, [currentPage, itemsPerPage]); // Empty dependency array ensures this runs only on mount
-
-    const onPageChange = (page:any) => {
-        const newCurrentPage = Number(page);
-        setCurrentPage(newCurrentPage);
-        CallProduct(newCurrentPage, itemsPerPage, sortBy, sortOrder)
-    };
-
-    const onchangeItemsPerPage = (iPerPage: any) => {
-        const newItemsPerPage = Number(iPerPage);
-        setItemsPerPage(newItemsPerPage)
-        CallProduct(1, newItemsPerPage, sortBy,sortOrder)
-    };
-
+    }, []); // Empty dependency array ensures this runs only on mount
 
     const CallCheckuser = async () => {
-        setLoading(true);
+        props.setLoading(true);
         try {
             const response = await CheckuserFunction();
             if (response.Success === true) {
                 if (!response.data) {
-                    setLoading(false);
+                    props.setLoading(false);
                 } else {
-                    await CallProduct(currentPage, itemsPerPage, sortBy, sortOrder);
+                    await CallSubCategory(currentPage, itemsPerPage, sortBy, sortOrder);
                 }
             } else {
-                setLoading(false);
+                props.setLoading(false);
             }
         } catch {
             toast.error("Server is not working", {
@@ -77,28 +57,29 @@ const ListProduct = (props: any) => {
                 },
                 duration: 2000,
             });
-            setLoading(false);
+            return false;
         }
     };
 
-    const CallProduct = async (cP:any,iP:any,sB:string,sO:number) => {
-        setLoading(true);
+
+    const CallSubCategory = async (cP: any, iP: number, sB:string, sO:number) => {
+        props.setLoading(true);
         try {
             let jsonObject = {
                 reversestatus: sO, // order by
                 qpara: sB, // order type
-                searchKey: searchTerm, // search key
-                onset_val: (Number(cP) - 1) * Number(iP), // offset
-                offset_val: Number(iP) // limit
+                searchKey: searchTerm, // search
+                onset_val: (cP - 1) * iP, // offset
+                offset_val: iP // limit
             };
 
-            let response = await ProductFunction(jsonObject);
+            let response = await SubCategoryFunction(jsonObject);
             if (response.Success) {
-                setTotalRecords(response.data.productCount);
-                setProductList(response.data.productModels);
-                setLoading(false);
+                setTotalRecords(response.data.subCategoryCount);
+                setSubCategoryList(response.data.subCategoryTypeModels);
+                props.setLoading(false);
             } else {
-                setLoading(false);
+                props.setLoading(false);
             }
         } catch {
             toast.error("Server is not working", {
@@ -109,7 +90,7 @@ const ListProduct = (props: any) => {
                 },
                 duration: 2000,
             });
-            setLoading(false);
+            props.setLoading(false);
         }
     };
 
@@ -117,17 +98,28 @@ const ListProduct = (props: any) => {
         setSearchTerm(event.target.value);
     };
 
-    const addProduct = () => {
+    const searchData= ()=>{
+        CallSubCategory(1, itemsPerPage, sortBy, sortOrder)
+    }
+
+    const onPageChange = (page: any) => {
+        setCurrentPage(Number(page));
+        CallSubCategory(page, itemsPerPage, sortBy, sortOrder);
+    };
+
+    const onchangeItemsPerPage = (iPerPage: any) => {
+        const newItemsPerPage = Number(iPerPage);
+        setItemsPerPage(newItemsPerPage)
+        CallSubCategory(1, newItemsPerPage, sortBy, sortOrder)
+    };
+
+    const addCategory = () => {
         navigate('/product/save');
     };
 
-    const searchData= ()=>{
-        CallProduct(1, itemsPerPage, sortBy, sortOrder)
-    }
-
-        // Function to toggle sorting order
+    // Function to toggle sorting order
     const toggleSortOrder = () => {
-        setSortOrder(sortOrder  === 0 ? 1 : 0);
+    setSortOrder(sortOrder  === 0 ? 1 : 0);
     };
 
     const handleSort =async (columnName:any) => {
@@ -135,47 +127,57 @@ const ListProduct = (props: any) => {
             toggleSortOrder();
         } else {
             setSortBy(columnName);
-            setSortOrder(0);
+        setSortOrder(0);
         }
-        await CallProduct(currentPage, itemsPerPage, columnName, sortOrder);
-    };
+    await CallSubCategory(currentPage, itemsPerPage, columnName, sortOrder);
+};
 
     return (
         <div>
-            <h4>Product</h4>
+            <h4>SubCategory</h4>
             <hr/>
             <div className="navbar navbar-light">
                 <div className="container-fluid">
-                    <button className="btn btn-outline-primary" type="button" onClick={addProduct}>Add</button>
+                    <button className="btn btn-outline-primary" type="button" onClick={addCategory}>Add</button>
                     <div className="d-flex">
-                        <input className="form-control me-2" type="search" placeholder="Search" aria-label="Search" onChange={handleSearchChange} />
+                        <input className="form-control me-2" type="search" placeholder="Search" aria-label="Search" onChange={handleSearchChange}/>
                         <button className="btn btn-outline-success" type="button" onClick={searchData}>Search</button>
                     </div>
                 </div>
             </div>
-
             <table className="m-3 table">
                 <thead className="table-primary">
                     <tr>
                         <th scope="col" onClick={() => handleSort('id')}>
                             # {sortBy === 'id' && <span>{sortOrder === 0 ? <i className="bi bi-arrow-up"></i> : <i className="bi bi-arrow-down"></i>}</span>}
                         </th>
-                        <th scope="col">Code</th>
-                        <th scope="col"  onClick={() => handleSort('CategoryName')}>
-                            Name {sortBy === 'CategoryName' && <span>{sortOrder === 0 ? <i className="bi bi-arrow-up"></i> : <i className="bi bi-arrow-down"></i>}</span>}
+                        <th scope="col" onClick={() => handleSort('ProductName')}>
+                            Product Name {sortBy === 'ProductName' && <span>{sortOrder === 0 ? <i className="bi bi-arrow-up"></i> : <i className="bi bi-arrow-down"></i>}</span>}</th>
+                        <th scope="col" onClick={() => handleSort('CategoryName')}>
+                            Category Name {sortBy === 'CategoryName' && <span>{sortOrder === 0 ? <i className="bi bi-arrow-up"></i> : <i className="bi bi-arrow-down"></i>}</span>}
                         </th>
-                        <th scope="col">Active</th>
+                        <th scope="col">SubCategory Code</th>
+                        <th scope="col" onClick={() => handleSort('CategoryPath')}>
+                        SubCategory Path {sortBy === 'CategoryPath' && <span>{sortOrder === 0 ? <i className="bi bi-arrow-up"></i> : <i className="bi bi-arrow-down"></i>}</span>}
+                            </th>
+                        <th scope="col" onClick={() => handleSort('SubCategoryValue')}>
+                        SubCategory Value {sortBy === 'SubCategoryValue' && <span>{sortOrder === 0 ? <i className="bi bi-arrow-up"></i> : <i className="bi bi-arrow-down"></i>}</span>}
+                            </th>
+                        <th scope="col"> Active </th>
                         <th scope="col">Action</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {productList.map((product, index) => (
-                        <tr key={product.pid}>
-                            <th scope="row">{index + 1}</th>
-                            <td>{product.code}</td>
-                            <td>{product.name}</td>
+                    {subCategoryList && subCategoryList.map((subcategory, index) => (
+                        <tr key={subcategory.subCategoryId}>
+                            <th scope="row">{(currentPage - 1) * itemsPerPage + (index + 1)}</th>
+                            <td>{subcategory.productName}</td>
+                            <td>{subcategory.categoryName}</td>
+                            <td>{subcategory.subCategoryCode}</td>
+                            <td>{subcategory.subCategoryPath}</td>
+                            <td>{subcategory.subCategoryValue}</td>
                             <td>
-                                {product.active ? (
+                                {subcategory.active ? (
                                     <span role="img" aria-label="Active">&#128994;</span>
                                 ) : (
                                     <span role="img" aria-label="Inactive">&#128308;</span>
@@ -204,15 +206,14 @@ const ListProduct = (props: any) => {
                     ))}
                 </tbody>
             </table>
-
             <Pagination
-            recordsPerPage={totalRecords}
-            totalRecords={totalRecords}
-            onPageChange={onPageChange}
-            onchangeItemsPerPage={onchangeItemsPerPage} // Correct prop name
+                recordsPerPage={itemsPerPage}
+                totalRecords={totalRecords}
+                onPageChange={onPageChange}
+                onchangeItemsPerPage={onchangeItemsPerPage} // Correct prop name
             />
         </div>
-    );
-};
+    )
+}
 
-export default ListProduct;
+export default ListSubCategory;

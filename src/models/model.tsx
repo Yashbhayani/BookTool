@@ -16,3 +16,14 @@ export interface ICategoryModel {
     categoryPath: string;
     isActive: boolean;
 }
+
+
+export interface ISubcategoryModel {
+    subCategoryId: string;
+    productName: string;
+    categoryName: string;
+    subCategoryCode: string;
+    subCategoryValue: string;
+    subCategoryPath: string;
+    active: boolean;
+}

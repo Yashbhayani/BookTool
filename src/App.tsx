@@ -19,8 +19,8 @@ import Books from "./Component/MainComponent/BooksComponent/Books";
 import User from "./Component/MainComponent/UserComponent/User";
 import Users from "./Component/MainComponent/UsersComponent/Users";
 import ListProduct from "./Component/MainComponent/Setting/ProductComponent/ListProductComponent/ListProduct";
-import Category from "./Component/MainComponent/Setting/CategoryComponent/ListCategoryComponent/Category";
-import SubCategory from "./Component/MainComponent/Setting/SubCategoryComponent/SubCategory";
+import ListCategory from "./Component/MainComponent/Setting/CategoryComponent/ListCategoryComponent/ListCategory";
+import ListSubCategory from "./Component/MainComponent/Setting/SubCategoryComponent/ListSubCategoryComponent/ListSubCategory";
 import AddProduct from "./Component/MainComponent/Setting/ProductComponent/AddProductComponent/AddProduct";
 import path from "path";
 
@@ -75,7 +75,7 @@ function App() {
       path: '/category',
       element: (
         <Header setLoading={setLoading}>
-          <Category setLoading={setLoading} />
+          <ListCategory setLoading={setLoading} />
         </Header>
       ),
     },
@@ -83,7 +83,7 @@ function App() {
       path: '/subcategory',
       element: (
         <Header setLoading={setLoading}>
-          <SubCategory setLoading={setLoading} />
+          <ListSubCategory setLoading={setLoading} />
         </Header>
       ),
     },

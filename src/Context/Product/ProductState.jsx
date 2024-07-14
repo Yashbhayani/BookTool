@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Productcontex from "./ProductContext";
-import { producturl, categoryurl } from "../API/ApiRouter";
+import { producturl, categoryurl, subcategoryurl, productcodeurl} from "../API/ApiRouter";
 
 
 const ProductState = (props) => {
@@ -42,11 +42,51 @@ const ProductState = (props) => {
         }
     };
 
+    const SubCategoryFunction = async (report) => {
+        try {
+            let jsonString = JSON.stringify(report);
+            let reportParam = encodeURIComponent(jsonString);
+            let urlWithParams = `${subcategoryurl}?report=${reportParam}`;
+            const response = await fetch(urlWithParams, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "token": sessionStorage.getItem("token")
+                }
+            });
+            const json = await response.json();
+            return json;
+        } catch (e) {
+            console.error('Error fetching data:', e);
+        }
+    };
+
+
+    const ProductCodeFunction = async (code) => {
+        try {
+            let urlWithParams = `${productcodeurl}?code=${code}`;
+            const response = await fetch(urlWithParams, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "token": sessionStorage.getItem("token")
+                }
+            });
+            const json = await response.json();
+            return json;
+        } catch (e) {
+            console.error('Error fetching data:', e);
+        }
+    };
+
+
     return (
         <Productcontex.Provider
             value={{
                 ProductFunction,
-                CategoryFunction
+                CategoryFunction,
+                SubCategoryFunction,
+                ProductCodeFunction
             }}
         >
             {props.children}

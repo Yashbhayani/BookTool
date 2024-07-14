@@ -1,13 +1,20 @@
 import React, { useContext, useEffect, useState } from 'react';
 import HomeContext from '../../../../../Context/Home/HomeContext';
 import { useNavigate } from 'react-router-dom';
+import Authcontex from '../../../../../Context/Auth/AuthContext';
+import Productcontex from '../../../../../Context/Product/ProductContext';
+import { debounce, upperCase } from 'lodash';
+import { DebounceInput } from 'react-debounce-input';
 
 const AddProduct = (props: any) => {
-    const context = useContext(HomeContext);
-    const { DashboardFunction } = context;
+    const context = useContext(Authcontex);
+    const Productcontext = useContext(Productcontex);
+    const { CheckuserFunction } = context;
+    const { ProductCodeFunction } = Productcontext;
     const navigate = useNavigate();
     const [code, setCode] = useState('');
     const [name, setName] = useState('');
+    const [isChecking, setIsChecking] = useState(false);
     const [errors, setErrors] = useState<{ [key: string]: string }>({
         code: '',
         name: '',
@@ -64,27 +71,40 @@ const AddProduct = (props: any) => {
         // setShowForm(false);
     };
 
-    const handleCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const newCode = e.target.value;
-        setCode(newCode);
-        // Clear error when input changes
-        setErrors((prevErrors) => ({
-            ...prevErrors,
-            code: '',
-        }));
-        // Validate code here if needed
+    const CheckCode = async (value:any) => {
+        const response = await ProductCodeFunction(value);
+        if(response.data){
+            setErrors((prevErrors) => ({
+                ...prevErrors,
+                code: '',
+            }));
+            props.setLoading(false);
+        }else{
+            setErrors((prevErrors) => ({
+                ...prevErrors,
+                code: 'Code is Alredy added',
+            }));
+            props.setLoading(false);
+        }
+    }
+
+    const handleCodeChange = (e:any) => {
+        const {value} = e.target;
+        setCode(value.toUpperCase());
+        props.setLoading(true);
+        CheckCode(value.toUpperCase())
     };
 
-    const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const newName = e.target.value;
-        setName(newName);
-        // Clear error when input changes
+    const handleNameChange = (e:any) => {
+        e.preventDefault();
+        const { value } = e.target;
+        setName(value);
         setErrors((prevErrors) => ({
             ...prevErrors,
             name: '',
         }));
-        // Validate name here if needed
     };
+
 
     return (
         <div>
@@ -93,12 +113,14 @@ const AddProduct = (props: any) => {
             <form className="row g-3" onSubmit={handleSubmit}>
                 <div className="col-md-6">
                     <label htmlFor="inputCode" className="form-label">Code</label>
-                    <input
-                        type="text"
-                        className={`form-control ${errors.code ? 'is-invalid' : ''}`}
-                        id="inputCode"
-                        value={code}
-                        onChange={handleCodeChange}
+                    <DebounceInput
+                    type="text"
+                    minLength={3}
+                    debounceTimeout={300}
+                    className={`form-control ${errors.code ? 'is-invalid' : ''}`}
+                    id="inputCode"
+                    value={code.toUpperCase()}
+                    onChange={handleCodeChange}
                     />
                     {errors.code && <div className="invalid-feedback">{errors.code}</div>}
                 </div>
@@ -113,7 +135,7 @@ const AddProduct = (props: any) => {
                     />
                     {errors.name && <div className="invalid-feedback">{errors.name}</div>}
                 </div>
-                <button type="submit" className="btn btn-primary">Submit</button>
+                <button type="submit" className="btn btn-outline-primary">Submit</button>
             </form>
         </div>
     );
