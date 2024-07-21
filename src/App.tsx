@@ -23,6 +23,7 @@ import ListCategory from "./Component/MainComponent/Setting/CategoryComponent/Li
 import ListSubCategory from "./Component/MainComponent/Setting/SubCategoryComponent/ListSubCategoryComponent/ListSubCategory";
 import AddProduct from "./Component/MainComponent/Setting/ProductComponent/AddProductComponent/AddProduct";
 import path from "path";
+import AddCategory from "./Component/MainComponent/Setting/CategoryComponent/AddCategoryComponent/AddCategory";
 
 function App() {
   const [loading, setLoading] = useState(false);
@@ -76,6 +77,14 @@ function App() {
       element: (
         <Header setLoading={setLoading}>
           <ListCategory setLoading={setLoading} />
+        </Header>
+      ),
+    },
+    {
+      path: '/category/save',
+      element: (
+        <Header setLoading={setLoading}>
+          <AddCategory setLoading={setLoading} />
         </Header>
       ),
     },

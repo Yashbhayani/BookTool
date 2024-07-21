@@ -110,7 +110,7 @@ const ListCategory = (props: any) => {
     };
 
     const addCategory = () => {
-        navigate('/product/save');
+        navigate('/category/save');
     };
 
     const searchData= ()=>{

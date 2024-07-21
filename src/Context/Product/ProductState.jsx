@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Productcontex from "./ProductContext";
-import { producturl, categoryurl, subcategoryurl, productcodeurl} from "../API/ApiRouter";
+import { producturl, categoryurl, subcategoryurl, productcodeurl, saveproducturl} from "../API/ApiRouter";
 
 
 const ProductState = (props) => {
@@ -79,6 +79,24 @@ const ProductState = (props) => {
         }
     };
 
+    const SaveProductFuncation = async(formdata)=>{
+        try {
+            const response = await fetch(saveproducturl, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "token": sessionStorage.getItem("token")
+                },
+                body: JSON.stringify(formdata),
+
+            });
+            const json = await response.json();
+            return json;
+        } catch (e) {
+            console.error('Error fetching data:', e);
+        }
+    }
+
 
     return (
         <Productcontex.Provider
@@ -86,7 +104,8 @@ const ProductState = (props) => {
                 ProductFunction,
                 CategoryFunction,
                 SubCategoryFunction,
-                ProductCodeFunction
+                ProductCodeFunction,
+                SaveProductFuncation
             }}
         >
             {props.children}

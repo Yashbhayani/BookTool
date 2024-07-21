@@ -5,12 +5,14 @@ import Authcontex from '../../../../../Context/Auth/AuthContext';
 import Productcontex from '../../../../../Context/Product/ProductContext';
 import { debounce, upperCase } from 'lodash';
 import { DebounceInput } from 'react-debounce-input';
+import { IProductSaveModel } from '../../../../../models/savemodel';
+import toast from 'react-hot-toast';
 
 const AddProduct = (props: any) => {
     const context = useContext(Authcontex);
     const Productcontext = useContext(Productcontex);
     const { CheckuserFunction } = context;
-    const { ProductCodeFunction } = Productcontext;
+    const { ProductCodeFunction, SaveProductFuncation } = Productcontext;
     const navigate = useNavigate();
     const [code, setCode] = useState('');
     const [name, setName] = useState('');
@@ -23,52 +25,93 @@ const AddProduct = (props: any) => {
     useEffect(() => {
         const token = sessionStorage.getItem("token");
         if (token !== null && token !== undefined && token !== "") {
+            CallCheckuser();
         } else {
             navigate('/login');
         }
     }, []); // Empty dependency array ensures this runs only on mount
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const CallCheckuser = async () => {
+        props.setLoading(true);
+        try {
+            const response = await CheckuserFunction();
+            if (response.Success === true) {
+                if (!response.data) {
+                    navigate('/');
+                    props.setLoading(false);
+                } else {
+                    props.setLoading(false);
+                }
+            } else {
+                props.setLoading(false);
+            }
+        } catch {
+            toast.error("Server is not working", {
+                style: {
+                    borderRadius: '10px',
+                    background: '#333',
+                    color: '#fff',
+                },
+                duration: 2000,
+            });
+            props.setLoading(false);
+        }
+    };
+
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        props.setLoading(true);
 
-        // Check if fields are empty
         if (!code.trim() || !name.trim()) {
-
             if (!code.trim()) {
                 setErrors((prevErrors) => ({
                     ...prevErrors,
                     code: 'Code is required',
                 }));
             }
-
             if (!name.trim()) {
                 setErrors((prevErrors) => ({
                     ...prevErrors,
                     name: 'Name is required',
                 }));
             }
+            props.setLoading(false);
             return;
         }
 
-        if (!name.trim()) {
-            setErrors((prevErrors) => ({
-                ...prevErrors,
-                name: 'Name is required',
-            }));
-            return;
+        let product:IProductSaveModel ={
+            code : code,
+            name : name
         }
-        // Handle form submission logic here
-        console.log("Code:", code);
-        console.log("Name:", name);
 
-        // Reset errors after successful submission
-        setErrors({
-            code: '',
-            name: '',
-        });
-
-        // Optionally, you can close the form after submission
-        // setShowForm(false);
+        const response = await SaveProductFuncation(product);
+        if(response.Success){
+            setCode('');
+            setName('');
+            setErrors({
+                code: '',
+                name: '',
+            });
+            props.setLoading(false);
+            toast.success(response.Message, {
+                style: {
+                    borderRadius: '10px',
+                    background: '#333',
+                    color: '#fff',
+                },
+                duration: 2000,
+            });
+        }else{
+            props.setLoading(false);
+            toast.error(response.Message, {
+                style: {
+                    borderRadius: '10px',
+                    background: '#333',
+                    color: '#fff',
+                },
+                duration: 2000,
+            })
+        }
     };
 
     const CheckCode = async (value:any) => {
@@ -90,9 +133,9 @@ const AddProduct = (props: any) => {
 
     const handleCodeChange = (e:any) => {
         const {value} = e.target;
-        setCode(value.toUpperCase());
+        setCode(value.toUpperCase().replace(/\s/g, ''));
         props.setLoading(true);
-        CheckCode(value.toUpperCase())
+        CheckCode(value.toUpperCase().replace(/\s/g, ''))
     };
 
     const handleNameChange = (e:any) => {
@@ -119,7 +162,7 @@ const AddProduct = (props: any) => {
                     debounceTimeout={300}
                     className={`form-control ${errors.code ? 'is-invalid' : ''}`}
                     id="inputCode"
-                    value={code.toUpperCase()}
+                    value={code.toUpperCase().replace(/\s/g, '')}
                     onChange={handleCodeChange}
                     />
                     {errors.code && <div className="invalid-feedback">{errors.code}</div>}
@@ -135,7 +178,7 @@ const AddProduct = (props: any) => {
                     />
                     {errors.name && <div className="invalid-feedback">{errors.name}</div>}
                 </div>
-                <button type="submit" className="btn btn-outline-primary">Submit</button>
+                <button type="submit" className="btn btn-outline-primary m-3">Submit</button>
             </form>
         </div>
     );
