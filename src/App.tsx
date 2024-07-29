@@ -33,11 +33,14 @@ function App() {
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       let token = sessionStorage.getItem("token");
       if (token) {
         loginAction(true); // Dispatch action to update login state
+        setLoading(false);
       } else {
         loginAction(false); // Dispatch action to update login state
+        setLoading(false);
       }
     };
     fetchData();

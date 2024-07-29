@@ -27,3 +27,9 @@ export interface ISubcategoryModel {
     subCategoryPath: string;
     active: boolean;
 }
+
+
+export interface IProductSelectList{
+    id: number;
+    name: string;
+}

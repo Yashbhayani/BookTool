@@ -13,6 +13,17 @@ const Home = (props: any) => {
     const [TotalUser, setTotalUser] = useState(0);
     const navigate = useNavigate();
 
+    useEffect(() => {
+        props.setLoading(true);
+        const token = sessionStorage.getItem("token");
+        if (token) {
+            CallDashboard();
+        } else {
+            props.setLoading(false);
+            navigate('/login');
+        }
+    }, [navigate]);
+
     const CallDashboard = async () => {
         props.setLoading(true);
         try {
@@ -46,18 +57,6 @@ const Home = (props: any) => {
             props.setLoading(false);
         }
     };
-
-    useEffect(() => {
-        props.setLoading(true);
-        const token = sessionStorage.getItem("token");
-        if (token) {
-            CallDashboard();
-        } else {
-            props.setLoading(false);
-            navigate('/login');
-        }
-    }, [navigate]);
-
 
 
     return (

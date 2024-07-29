@@ -18,7 +18,13 @@ const Header = (props: any) => {
   const [Checkuser, setCheckuser] = useState(false);
 
   useEffect(() => {
-    CallCheckuser();
+    const token = sessionStorage.getItem("token");
+    if (token !== null && token !== undefined && token !== "") {
+        CallCheckuser();
+    } else {
+      props.setLoading(false);
+      navigate('/login');
+    }
   }, []);
 
   const CallCheckuser = async () => {

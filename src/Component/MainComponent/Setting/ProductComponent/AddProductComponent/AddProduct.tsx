@@ -80,6 +80,7 @@ const AddProduct = (props: any) => {
         }
 
         let product:IProductSaveModel ={
+            pid : "",
             code : code,
             name : name
         }
@@ -153,30 +154,32 @@ const AddProduct = (props: any) => {
         <div>
             <h4>Add Product</h4>
             <hr />
-            <form className="row g-3" onSubmit={handleSubmit}>
-                <div className="col-md-6">
-                    <label htmlFor="inputCode" className="form-label">Code</label>
-                    <DebounceInput
-                    type="text"
-                    minLength={3}
-                    debounceTimeout={300}
-                    className={`form-control ${errors.code ? 'is-invalid' : ''}`}
-                    id="inputCode"
-                    value={code.toUpperCase().replace(/\s/g, '')}
-                    onChange={handleCodeChange}
-                    />
-                    {errors.code && <div className="invalid-feedback">{errors.code}</div>}
-                </div>
-                <div className="col-md-6">
-                    <label htmlFor="inputName" className="form-label">Name</label>
-                    <input
-                        type="text"
-                        className={`form-control ${errors.name ? 'is-invalid' : ''}`}
-                        id="inputName"
-                        value={name}
-                        onChange={handleNameChange}
-                    />
-                    {errors.name && <div className="invalid-feedback">{errors.name}</div>}
+            <form onSubmit={handleSubmit}>
+                <div className="row g-3">
+                    <div className="col-md-6">
+                        <label htmlFor="inputCode" className="form-label">Code</label>
+                        <DebounceInput
+                            type="text"
+                            minLength={3}
+                            debounceTimeout={300}
+                            className={`form-control ${errors.code ? 'is-invalid' : ''}`}
+                            id="inputCode"
+                            value={code.toUpperCase().replace(/\s/g, '')}
+                            onChange={handleCodeChange}
+                        />
+                        {errors.code && <div className="invalid-feedback">{errors.code}</div>}
+                    </div>
+                    <div className="col-md-6">
+                        <label htmlFor="inputName" className="form-label">Name</label>
+                        <input
+                            type="text"
+                            className={`form-control ${errors.name ? 'is-invalid' : ''}`}
+                            id="inputName"
+                            value={name}
+                            onChange={handleNameChange}
+                        />
+                        {errors.name && <div className="invalid-feedback">{errors.name}</div>}
+                    </div>
                 </div>
                 <button type="submit" className="btn btn-outline-primary m-3">Submit</button>
             </form>

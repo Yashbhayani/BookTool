@@ -1,6 +1,10 @@
 import React, { useState } from "react";
 import Productcontex from "./ProductContext";
-import { producturl, categoryurl, subcategoryurl, productcodeurl, saveproducturl} from "../API/ApiRouter";
+import {
+    producturl, categoryurl, subcategoryurl, categorycodeurl, select_category_list,
+    select_product_list, productcodeurl, saveproducturl, categorycodepath,
+    savecategoryurl
+} from "../API/ApiRouter";
 
 
 const ProductState = (props) => {
@@ -79,7 +83,59 @@ const ProductState = (props) => {
         }
     };
 
-    const SaveProductFuncation = async(formdata)=>{
+    const CategoryCodeFunction = async (code) => {
+        try {
+            let urlWithParams = `${categorycodeurl}?code=${code}`;
+            const response = await fetch(urlWithParams, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "token": sessionStorage.getItem("token")
+                }
+            });
+            const json = await response.json();
+            return json;
+        } catch (e) {
+            console.error('Error fetching data:', e);
+        }
+    };
+
+    const CategoryPathFunction = async (path) => {
+        try {
+            let urlWithParams = `${categorycodepath}?code=${path}`;
+            const response = await fetch(urlWithParams, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "token": sessionStorage.getItem("token")
+                }
+            });
+            const json = await response.json();
+            return json;
+        } catch (e) {
+            console.error('Error fetching data:', e);
+        }
+    };
+
+
+    const SelectCategoryListFunction = async (Pid) => {
+        try {
+            let urlWithParams = `${select_category_list}?pid=${Pid}`;
+            const response = await fetch(urlWithParams, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "token": sessionStorage.getItem("token")
+                }
+            });
+            const json = await response.json();
+            return json;
+        } catch (e) {
+            console.error('Error fetching data:', e);
+        }
+    };
+
+    const SaveProductFuncation = async (formdata) => {
         try {
             const response = await fetch(saveproducturl, {
                 method: "POST",
@@ -97,6 +153,39 @@ const ProductState = (props) => {
         }
     }
 
+    const SelectProductListFunction = async () => {
+        try {
+            const response = await fetch(select_product_list, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "token": sessionStorage.getItem("token")
+                }
+            });
+            const json = await response.json();
+            return json;
+        } catch (e) {
+            console.error('Error fetching data:', e);
+        }
+    };
+
+    const SaveCategoryFuncation = async (formdata) => {
+        try {
+            const response = await fetch(savecategoryurl, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "token": sessionStorage.getItem("token")
+                },
+                body: JSON.stringify(formdata),
+
+            });
+            const json = await response.json();
+            return json;
+        } catch (e) {
+            console.error('Error fetching data:', e);
+        }
+    }
 
     return (
         <Productcontex.Provider
@@ -105,7 +194,12 @@ const ProductState = (props) => {
                 CategoryFunction,
                 SubCategoryFunction,
                 ProductCodeFunction,
-                SaveProductFuncation
+                SaveProductFuncation,
+                SelectProductListFunction,
+                CategoryCodeFunction,
+                CategoryPathFunction,
+                SelectCategoryListFunction,
+                SaveCategoryFuncation
             }}
         >
             {props.children}
